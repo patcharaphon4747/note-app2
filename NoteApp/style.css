@@ -1,0 +1,73 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background: #fff0f5;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+}
+
+.app-container, .profile-container, .login-container {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: auto;
+}
+
+.note-item {
+  list-style: none;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 15px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 6px 10px;      /* ปรับขนาดให้เล็กลง */
+  border: none;
+  background: #f75c76;
+  border-radius: 10px;
+  font-size: 0.85em;       /* ลดขนาดตัวอักษรลง */
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #ffe4f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+td, th {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+#note-content {
+  width: 80%;
+  height: 320px; /* เดิม 100px → x4 */
+  padding: 15px;
+  font-size: 1.2em;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.notification {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffd9ec;
+  color: #d63384;
+  padding: 12px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  z-index: 9999;
+  transition: all 0.3s ease;
+}

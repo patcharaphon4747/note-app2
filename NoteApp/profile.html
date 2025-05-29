@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>โปรไฟล์ 💁‍♀️</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="profile-container">
+    <h1>👤 โปรไฟล์ของคุณ</h1>
+    <div id="user-info"></div>
+
+    <h2>📋 Notifcation</h2>
+    <table id="note-table">
+      <thead>
+        <tr><th>ชื่อโน้ต</th><th>วันที่</th><th>เนื้อหา</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button onclick="window.location.href='note.html'">📓 กลับไปเขียนโน้ต</button>
+    <button onclick="logout()">🚪 ออกจากระบบ</button>
+  </div>
+
+  <script>
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        document.getElementById("user-info").innerHTML = `
+          <p><strong>ชื่อ:</strong> ${user.displayName}</p>
+          <p><strong>อีเมล:</strong> ${user.email}</p>
+        `;
+        const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+        const tbody = document.querySelector("#note-table tbody");
+        notes.forEach(note => {
+          const row = `<tr>
+            <td>${note.title}</td>
+            <td>${note.date}</td>
+            <td>${note.content}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>

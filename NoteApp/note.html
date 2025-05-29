@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Note App น่ารัก 💖</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <span id="user-name">👤</span>
+    <a href="profile.html" class="nav-btn">💁‍♀️ โปรไฟล์</a>
+    <a href="profile.html" class="nav-btn">🚪 ออกจากระบบ</a>
+  </div>
+   <!-- 🔔 กล่องแจ้งเตือน -->
+  <div id="notification" class="notification">บันทึกโน้ตเรียบร้อยแล้ว! 🎉</div>
+  <div class="app-container">
+    <h1>📝 สร้างโน้ตใหม่</h1>
+    <input type="date" id="note-date">
+    <select id="note-color">
+      <option value="#ffccf9">ชมพู</option>
+      <option value="#fff799">เหลือง</option>
+      <option value="#c5f4e0">เขียว</option>
+      <option value="#cce0ff">ฟ้า</option>
+    </select>
+    <input type="text" id="note-title" placeholder="ชื่อโน้ต ✏️">
+    <textarea id="note-content" placeholder="เนื้อหาโน้ต 📝"></textarea>
+    <button onclick="saveNote()">💾 บันทึกโน้ต</button>
+
+    <input type="text" id="search" placeholder="🔍 ค้นหาโน้ต..." onkeyup="searchNotes()">
+    <ul id="note-list"></ul>
+  </div>
+
+  <script>
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("user-name").innerText = `👤 ${user.displayName}`;
+        renderNotes();
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    function logout() {
+      firebase.auth().signOut().then(() => window.location.href = "index.html");
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
