@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ลูกค้า | MyFoodSys</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">MyFoodSys</div>
+    <div class="user-info">
+        สวัสดี, <span id="userName">คุณผู้ใช้</span>
+        <button class="logout-btn" id="logoutBtn">ออกจากระบบ</button>
+    </div>
+</nav>
+
+<div class="container">
+<aside class="sidebar">
+    <a href="index.html" data-tooltip="หน้าหลัก">🏠 หน้าหลัก</a>
+    <a href="buy.html" data-tooltip="สั่งอาหาร">🛍️ สั่งอาหาร</a>
+    <a href="menu.html" data-tooltip="เมนูอาหาร">🍽️ เมนูอาหาร</a>
+    <a href="promotion.html" data-tooltip="โปรโมชั่น">🎉 โปรโมชั่น</a>
+    <a href="orders.html" data-tooltip="รายการสั่งซื้อ">🛒 รายการสั่งซื้อ</a>
+    <a href="customers.html" class="active" data-tooltip="ลูกค้า">👥 ลูกค้า</a>
+    <a href="reports.html" data-tooltip="รายงาน">📊 รายงาน</a>
+</aside>
+
+    <main class="content">
+        <h1>ลูกค้า</h1>
+        <section class="card">
+            <h2>รายชื่อลูกค้าทั้งหมด</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ชื่อลูกค้า</th>
+                        <th>อีเมล</th>
+                        <th>วันที่ลงทะเบียน</th>
+                    </tr>
+                </thead>
+                <tbody id="customers-table">
+                    <tr><td colspan="4">กำลังโหลดข้อมูลลูกค้า...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+
+<footer class="footer">
+    &copy; 2025 MyFoodSys - ระบบจัดการร้านอาหาร สร้างโดยคุณ
+</footer>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<!-- Firebase config -->
+<script src="firebase-config.js"></script>
+
+<!-- Main application logic -->
+<script src="app.js"></script>
+
+</body>
+</html>

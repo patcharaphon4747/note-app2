@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>สั่งอาหาร | MyFoodSys</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">MyFoodSys</div>
+    <div class="user-info">
+        สวัสดี, <span id="userName">คุณผู้ใช้</span>
+        <button class="logout-btn" id="logoutBtn">ออกจากระบบ</button>
+    </div>
+</nav>
+
+<div class="container">
+    <aside class="sidebar">
+        <a href="index.html" data-tooltip="หน้าหลัก">🏠 หน้าหลัก</a>
+        <a href="buy.html" class="active" data-tooltip="สั่งอาหาร">🛍️ สั่งอาหาร</a>
+        <a href="menu.html" data-tooltip="เมนูอาหาร">🍽️ เมนูอาหาร</a>
+        <a href="promotion.html" data-tooltip="โปรโมชั่น">🎉 โปรโมชั่น</a>
+        <a href="orders.html" data-tooltip="รายการสั่งซื้อ">🛒 รายการสั่งซื้อ</a>
+        <a href="customers.html" data-tooltip="ลูกค้า">👥 ลูกค้า</a>
+        <a href="reports.html" data-tooltip="รายงาน">📊 รายงาน</a>
+    </aside>
+
+    <main class="content">
+        <h1>สั่งอาหาร</h1>
+        <div class="menu-grid" id="menu-items-container">
+            <p>กำลังโหลดเมนู...</p>
+        </div>
+    </main>
+</div>
+
+<footer class="footer">
+    &copy; 2025 MyFoodSys - ระบบจัดการร้านอาหาร สร้างโดยคุณ
+</footer>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<!-- Firebase config -->
+<script src="firebase-config.js"></script>
+
+<script>
+    // Global Logout Functionality (copied to this page as its specific logic is not in app.js for buy.html)
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = 'login.html';
+                })
+                .catch(error => {
+                    alert('เกิดข้อผิดพลาดในการออกจากระบบ: ' + error.message);
+                    console.error("Logout error: ", error);
+                });
+        });
+    }
+
+    // Page-specific logic for buy.html
+    const menuItemsContainer = document.getElementById('menu-items-container');
+
+    // Function to fetch and render menus from Firestore
+    async function fetchAndRenderMenus() {
+        try {
+            menuItemsContainer.innerHTML = '<p>กำลังโหลดเมนู...</p>';
+            const menusSnapshot = await db.collection('menus').orderBy('name').get();
+            if (menusSnapshot.empty) {
+                menuItemsContainer.innerHTML = '<p>ไม่มีเมนูอาหารในขณะนี้</p>';
+                return;
+            }
+
+            menuItemsContainer.innerHTML = '';
+            menusSnapshot.forEach(doc => {
+                const menu = doc.data();
+                const menuItemId = doc.id;
+
+                const card = document.createElement('div');
+                card.classList.add('menu-item-card');
+                card.innerHTML = `
+                    <h3>${menu.name}</h3>
+                    <p>${menu.price} บาท</p>
+                    <div class="order-form">
+                        <input type="number" value="1" min="1" class="quantity-input" data-menu-id="${menuItemId}" />
+                        <button class="buy-btn" data-menu-id="${menuItemId}" data-menu-name="${menu.name}" data-menu-price="${menu.price}">
+                            ซื้อ
+                        </button>
+                    </div>
+                `;
+                menuItemsContainer.appendChild(card);
+            });
+
+            document.querySelectorAll('.buy-btn').forEach(button => {
+                button.addEventListener('click', handleBuyClick);
+            });
+
+        } catch (error) {
+            console.error("Error fetching menus: ", error);
+            menuItemsContainer.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดเมนู</p>';
+            alert('เกิดข้อผิดพลาดในการโหลดเมนู: ' + error.message);
+        }
+    }
+
+    // Function to handle 'Buy' button click
+    async function handleBuyClick(event) {
+        const button = event.target;
+        const menuItemId = button.dataset.menuId;
+        const menuName = button.dataset.menuName;
+        const menuPrice = parseFloat(button.dataset.menuPrice);
+        const quantityInput = button.closest('.order-form').querySelector('.quantity-input');
+        const quantity = parseInt(quantityInput.value);
+
+        if (isNaN(quantity) || quantity <= 0) {
+            alert('กรุณาระบุจำนวนที่ถูกต้อง');
+            return;
+        }
+
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            alert('กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const totalAmount = menuPrice * quantity;
+
+        try {
+            await db.collection('orders').add({
+                menuId: menuItemId,
+                menuName: menuName,
+                price: menuPrice,
+                quantity: quantity,
+                total: totalAmount,
+                customerId: currentUser.uid,
+                customerName: currentUser.displayName || 'Unknown User',
+                orderDate: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert(`สั่งซื้อ "${menuName}" จำนวน ${quantity} รายการ เรียบร้อยแล้ว!`);
+        } catch (error) {
+            console.error("Error adding order: ", error);
+            alert('เกิดข้อผิดพลาดในการสั่งซื้อ: ' + error.message);
+        }
+    }
+
+    // Check login status and display user name, then fetch menus
+    auth.onAuthStateChanged(user => {
+        const userNameSpan = document.getElementById('userName');
+        if (userNameSpan) {
+            userNameSpan.textContent = user ? (user.displayName || user.email || 'คุณผู้ใช้') : 'คุณผู้ใช้';
+        }
+
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            fetchAndRenderMenus(); // Fetch menus only after user is authenticated
+        }
+    });
+</script>
+
+</body>
+</html>
